@@ -1,7 +1,5 @@
 from flask_restx import Resource
 from app import api, models_dao, celery
-from flask import request
-
 from app import db_model
 import os
 from joblib import dump, load
@@ -13,14 +11,11 @@ from sklearn.linear_model import LogisticRegression as LR
 from sklearn.tree import DecisionTreeClassifier as DT
 import numpy as np
 
-
 log = logging.getLogger(__name__)
 
 # * Словарь моделей, доступных для обучения
 models = {1:LR,
           2:DT}
-
-
 @api.route('/api/ml_models')
 class MLModels(Resource):
     """Класс для отображения списка доступных для обучения моделей
@@ -77,7 +72,7 @@ class MLModelTrain(Resource):
             
             path = f'./worker/models/model_{models_dao.num}.joblib'
             dump(model, path)
-            
+            # посылаем в контенер для обучения
             task = celery.send_task("train", args=[X, y, path])
             
             log.info("INFO: Training finished!")
@@ -94,7 +89,7 @@ class MLModelTrain(Resource):
         log.info(f"INFO: Trained models: {models_dao._trained_models}")
         models_dao.num += 1
 
-    def _add_to_bd(self, path, id):
+    def _add_to_bd(self, path, id): 
         item_doc = {
             'id': models_dao.num,
             'num': id,

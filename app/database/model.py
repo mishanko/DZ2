@@ -3,6 +3,11 @@ from log import log
 class Model:
 
     def __init__(self, db):
+        """Класс базы данных, со всеми операциями CRUD
+
+        Args:
+            db ([type]): [description]
+        """
         self.models = db.models
 
     def get(self, id):
